@@ -31,7 +31,9 @@ user_schema.pre("save" , async function(next){
         return next()
     }
 
-    await bcrypt.hash("password" , 10)
+    const hashedPassword = await bcrypt.hash(this.password!, 10);
+        this.password = hashedPassword;
+        next();
 })
 
 user_schema.methods.ispasswordCorrect = async function(password:string){

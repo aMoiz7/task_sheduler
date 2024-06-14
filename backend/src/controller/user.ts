@@ -68,7 +68,7 @@ export const singin = asynchandler(async(req:Request,res:Response,next:NextFunct
      throw new ApiError(400 , "user not exist")
     }
     //@ts-ignore
-    const isvalipassword = user.ispasswordCorrect()
+    const isvalipassword = user.ispasswordCorrect(password)
 
     if(!isvalipassword) throw new ApiError(400 , "invalid credentials")
 
@@ -84,7 +84,7 @@ export const singin = asynchandler(async(req:Request,res:Response,next:NextFunct
         const returnUser = await userSchema.findOne({ email }).select("-password");
          
  
-     res.status(200).cookie("accessToken" , accessToken , option).json(new ApiResponse(200 , user , "user creates succesfully" ))
+     res.status(200).cookie("accessToken" , accessToken , option).json(new ApiResponse(200 , returnUser , "user login succesfully" ))
      
  
  })

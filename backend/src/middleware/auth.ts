@@ -4,7 +4,7 @@ import { ApiError } from "../utils/apiError";
 import { asynchandler } from "../utils/asyncHandler";
 import  jwt  from 'jsonwebtoken';
 
- const auth = asynchandler(async(req:Request,res:Response,next:NextFunction)=>{
+ export const auth = asynchandler(async(req:Request,res:Response,next:NextFunction)=>{
     try {
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Barer","");
     
@@ -24,18 +24,18 @@ import  jwt  from 'jsonwebtoken';
     
             next();
     } catch (error) {
-          throw error
+        console.error(error)
+          throw error 
     }
   
   })
 
 
 
-  const adminAuth = (req, res, next) => {
+  export const adminAuth = (req, res, next) => {
     if (req.user.role !== 'admin') {
       return res.status(403).send({ error: 'Access denied' });
     }
     next();
   };
   
-  module.exports = { auth, adminAuth };
