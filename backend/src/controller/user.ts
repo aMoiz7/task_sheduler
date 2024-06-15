@@ -3,6 +3,8 @@ import { userSchema} from "../model/user";
 import { asynchandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/apiError";
 import { ApiResponse } from "../utils/apiResponse";
+import { taskschema } from "../model/task";
+import { error } from "console";
 
 
 const generateAccessToken = async(userid:any) =>{
@@ -84,7 +86,38 @@ export const singin = asynchandler(async(req:Request,res:Response,next:NextFunct
         const returnUser = await userSchema.findOne({ email }).select("-password");
          
  
-     res.status(200).cookie("accessToken" , accessToken , option).json(new ApiResponse(200 , returnUser , "user login succesfully" ))
+     res.status(200).cookie("accessToken" , accessToken , option).json(new ApiResponse(200 , returnUser , accessToken, "user login succesfully" ))
      
  
  })
+
+
+ export const finduseremail =asynchandler(async(req:Request,res:Response,next:NextFunction )=>{
+     const {userid} = req.body;
+
+     if(!userid)throw new ApiError(400 , "userid not found")
+
+     const useremail = await userSchema.findById(userid)
+
+     res.status(200).json(new ApiResponse(200 , useremail!.email , "user creates succesfully" ))
+
+ })
+
+
+ export const findUserTasks = asynchandler(async (req, res) => {
+    const userId = req.userId; // Assuming req.user is set by your authentication middleware
+  
+    try {
+      // Query tasks where assignedUser matches the authenticated user's ID
+      const userTasks = await taskschema.find({ assignedUser: userId });
+  
+      if (!userTasks || userTasks.length === 0) {
+        return res.status(404).json({ message: 'User tasks not found' });
+      }
+  
+      res.status(200).json({ tasks: userTasks, totalPages: userTasks.length }); // Assuming all tasks are returned as there might be only one
+    } catch (error) {
+      console.error('Error fetching user tasks:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });

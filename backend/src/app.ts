@@ -4,11 +4,15 @@ import { dot } from 'node:test/reporters'
 import { dbconnect } from './db/connection'
 import userRoute from "./routes/user"
 import taskRoute from "./routes/task"
-
+import cors from 'cors'
 
 dotenv.config()
 
 const app = express()
+app.use(cors({
+    origin:"http://localhost:5173",
+    credentials:true
+}))
 
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())

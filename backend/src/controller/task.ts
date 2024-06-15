@@ -65,11 +65,11 @@ export const getTaskById = asynchandler(async (req, res) => {
 // Edit a task
 export const updateTask = asynchandler(async (req, res) => {
     const { id } = req.params;
-    const  { title, description, dueDate,  } = req.body;
+    const  {  title, status, dueDate, priority, description ,email } = req.body;
   
     try {
-      const task = await taskschema.findById(id).populate('assignedUser', 'name email');
-      
+      const task = await taskschema.findById(id)
+      console.log(task)
       
 
       if (!task) {
@@ -87,12 +87,27 @@ export const updateTask = asynchandler(async (req, res) => {
         task.dueDate = dueDate
       }
 
+      if(status){
+        task.status = status
+      }
+
+      if(priority){
+        task.priority = priority
+      }
+      const user = await userSchema.findOne({email:email}); 
+      if (!user) {
+        return res.status(404).json({ message: 'user not found' });
+      }
+      // Update task fields
+    task.assignedUser = user._id;
     await task.save()
 
-    const updatedtask = await taskschema.findById(id).populate('assignedUser', 'name email');
+    const updatedtask = await taskschema.findById(id)
 
       res.status(200).json(updatedtask);
+      
     } catch (error) {
+        console.log(error)
       res.status(500).json({ message: 'Server error', error });
     }
   })
@@ -113,22 +128,23 @@ export const deleteTask = asynchandler(async (req, res) => {
   })
 
 // Update task status
+
 export const updateTaskStatus = asynchandler(async (req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
-  
-    try {
-      const task = await taskschema.findById(id);
-      if (!task) {
-        return res.status(404).json({ message: 'Task not found' });
-      }
-      task.status = status;
-      await task.save();
-      res.status(200).json(task);
-    } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const task = await taskschema.findById(id);
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
     }
-  })
+    task.status = status;
+    await task.save();
+    res.status(200).json(task);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+})
 
 // Assign task to user
 
@@ -160,4 +176,4 @@ export const updateTaskStatus = asynchandler(async (req, res) => {
   
 
   
- 
+   
