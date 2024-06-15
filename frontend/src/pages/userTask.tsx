@@ -16,8 +16,8 @@ const UserDashboard = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log(response)
       setTasks(response.data.tasks);
-      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error('Error fetching tasks:', error);
     }
